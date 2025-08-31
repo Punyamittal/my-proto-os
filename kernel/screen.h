@@ -1,55 +1,37 @@
-// screen.c
+#ifndef SCREEN_H
+#define SCREEN_H
 
-#include "screen.h"
+// VGA text mode constants
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
+#define VGA_BUFFER 0xB8000
 
-// VGA text mode starts at memory address 0xB8000
-volatile unsigned short* vga_buffer = (unsigned short*)0xB8000;
+// Color constants
+#define VGA_BLACK 0x00
+#define VGA_BLUE 0x01
+#define VGA_GREEN 0x02
+#define VGA_CYAN 0x03
+#define VGA_RED 0x04
+#define VGA_MAGENTA 0x05
+#define VGA_BROWN 0x06
+#define VGA_LIGHT_GREY 0x07
+#define VGA_DARK_GREY 0x08
+#define VGA_LIGHT_BLUE 0x09
+#define VGA_LIGHT_GREEN 0x0A
+#define VGA_LIGHT_CYAN 0x0B
+#define VGA_LIGHT_RED 0x0C
+#define VGA_LIGHT_MAGENTA 0x0D
+#define VGA_LIGHT_BROWN 0x0E
+#define VGA_WHITE 0x0F
 
-int cursor_row = 0;
-int cursor_col = 0;
+// Function declarations
+void init_screen();
+void clear_screen();
+void set_cursor(int row, int col);
+void print_char(char c, char color);
+void print_string(const char* str, char color);
+void print_string_at(const char* str, char color, int row, int col);
+void scroll_screen();
+void set_color(char color);
 
-unsigned char make_vga_entry(char c, char color) {
-    return ((unsigned short)color << 8) | c;
-}
-
-void set_cursor(int row, int col) {
-    cursor_row = row;
-    cursor_col = col;
-}
-
-void print_char(char c, char color) {
-    if (c == '\n') {
-        cursor_row++;
-        cursor_col = 0;
-    } else {
-        vga_buffer[cursor_row * VGA_WIDTH + cursor_col] = make_vga_entry(c, color);
-        cursor_col++;
-        if (cursor_col >= VGA_WIDTH) {
-            cursor_col = 0;
-            cursor_row++;
-        }
-    }
-
-    // Handle screen overflow (basic scroll: reset to top)
-    if (cursor_row >= VGA_HEIGHT) {
-        clear_screen();
-        cursor_row = 0;
-        cursor_col = 0;
-    }
-}
-
-void print_string(const char* str, char color) {
-    for (int i = 0; str[i] != '\0'; i++) {
-        print_char(str[i], color);
-    }
-}
-
-void clear_screen() {
-    for (int row = 0; row < VGA_HEIGHT; row++) {
-        for (int col = 0; col < VGA_WIDTH; col++) {
-            vga_buffer[row * VGA_WIDTH + col] = make_vga_entry(' ', 0x07); // white on black
-        }
-    }
-
-    set_cursor(0, 0);
-}
+#endif // SCREEN_H

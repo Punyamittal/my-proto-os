@@ -3,10 +3,19 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-// Initializes the keyboard (usually sets up interrupt handler)
+// Initialize the keyboard
 void init_keyboard();
 
-// Reads a single character (blocking or from buffer, depending on implementation)
+// Check if a key is available
+int key_available();
+
+// Read a single character (blocking or from buffer, depending on implementation)
 char get_char();
 
-#endif
+// Add a key to the buffer (for testing/demo purposes)
+void add_key_to_buffer(char key);
+
+// Poll keyboard for input (for demo purposes)
+void poll_keyboard();
+
+#endif // KEYBOARD_H

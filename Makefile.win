@@ -1,0 +1,87 @@
+# Makefile for ProtoOS (Windows version)
+# Builds a complete operating system with bootloader and kernel
+
+# Compiler and assembler
+CC = gcc
+AS = nasm
+LD = ld
+
+# Flags
+CFLAGS = -m32 -fno-pie -fno-stack-protector -nostdlib -nostdinc -fno-builtin -fno-pic -mno-red-zone
+ASFLAGS = -f elf32
+LDFLAGS = -m elf_i386 -T linker.ld
+
+# Directories
+BOOT_DIR = boot
+KERNEL_DIR = kernel
+BUILD_DIR = build
+
+# Source files
+BOOT_SOURCES = $(BOOT_DIR)/bootloader.asm
+KERNEL_SOURCES = $(KERNEL_DIR)/kernel.c $(KERNEL_DIR)/screen.c $(KERNEL_DIR)/keyboard.c
+
+# Object files
+BOOT_OBJECTS = $(BUILD_DIR)/bootloader.bin
+KERNEL_OBJECTS = $(BUILD_DIR)/kernel.bin
+
+# Final output
+OS_IMAGE = $(BUILD_DIR)/protoos.img
+
+# Default target
+all: $(OS_IMAGE)
+
+# Create build directory
+$(BUILD_DIR):
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+# Build bootloader
+$(BUILD_DIR)/bootloader.bin: $(BOOT_SOURCES) | $(BUILD_DIR)
+	$(AS) -f bin -o $@ $<
+
+# Build kernel
+$(BUILD_DIR)/kernel.bin: $(KERNEL_SOURCES) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $(KERNEL_DIR)/kernel.c -o $(BUILD_DIR)/kernel.o
+	$(CC) $(CFLAGS) -c $(KERNEL_DIR)/screen.c -o $(BUILD_DIR)/screen.o
+	$(CC) $(CFLAGS) -c $(KERNEL_DIR)/keyboard.c -o $(BUILD_DIR)/keyboard.o
+	$(LD) $(LDFLAGS) -o $@ $(BUILD_DIR)/kernel.o $(BUILD_DIR)/screen.o $(BUILD_DIR)/screen.o
+
+# Create OS image (Windows version)
+$(OS_IMAGE): $(BOOT_OBJECTS) $(KERNEL_OBJECTS)
+	# Create a 1.44MB floppy disk image using PowerShell
+	powershell -Command "& { $null = New-Item -ItemType File -Path '$@' -Force; $stream = [System.IO.File]::OpenWrite('$@'); $buffer = New-Object byte[] 1474560; $stream.Write($buffer, 0, $buffer.Length); $stream.Close() }"
+	# Write bootloader to first sector
+	copy /b $(BOOT_OBJECTS) + $(BUILD_DIR)/dummy.bin $(BUILD_DIR)/temp.bin >nul
+	copy /b $(BUILD_DIR)/temp.bin $(OS_IMAGE) >nul
+	# Write kernel starting from second sector
+	copy /b $(OS_IMAGE) + $(KERNEL_OBJECTS) $(BUILD_DIR)/temp2.bin >nul
+	copy /b $(BUILD_DIR)/temp2.bin $(OS_IMAGE) >nul
+	del $(BUILD_DIR)/temp.bin $(BUILD_DIR)/temp2.bin >nul
+
+# Clean build files
+clean:
+	if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+
+# Run in QEMU
+run: $(OS_IMAGE)
+	qemu-system-i386 -fda $(OS_IMAGE) -m 16
+
+# Install dependencies (Windows with Chocolatey)
+install-deps:
+	choco install nasm qemu
+
+# Install dependencies (Windows with winget)
+install-deps-winget:
+	winget install nasm.nasm
+	winget install qemu.qemu
+
+# Help
+help:
+	@echo ProtoOS Build System (Windows)
+	@echo =============================
+	@echo make all              - Build complete OS
+	@echo make clean            - Clean build files
+	@echo make run              - Run in QEMU
+	@echo make install-deps     - Install dependencies (Chocolatey)
+	@echo make install-deps-winget - Install dependencies (winget)
+
+.PHONY: all clean run install-deps install-deps-winget help

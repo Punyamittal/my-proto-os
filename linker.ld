@@ -1,18 +1,17 @@
-/* linker.ld - Simple linker script for kernel */
+/* linker.ld - Linker script for ProtoOS kernel */
 
-OUTPUT_FORMAT(elf32-i386)
+OUTPUT_FORMAT(binary)
 ENTRY(kernel_main)
 
 SECTIONS
 {
-    /* Set the load address of the kernel to 0x100000 (1MB) */
-    . = 0x00100000;
+    /* Set the load address of the kernel to 0x1000 (4KB) */
+    . = 0x1000;
 
     /* Code section */
     .text : {
-        *(.multiboot)         /* Multiboot header if present */
-        *(.text)              /* All .text sections */
-        *(.rodata)            /* Read-only data */
+        *(.text)
+        *(.rodata)
     }
 
     /* Initialized data */
