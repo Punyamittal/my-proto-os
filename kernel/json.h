@@ -37,3 +37,4 @@ int json_validate(const char* json_string);
 int json_get_array_length(const char* json_string, const char* key);
 
 #endif // JSON_H
+

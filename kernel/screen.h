@@ -33,5 +33,9 @@ void print_string(const char* str, char color);
 void print_string_at(const char* str, char color, int row, int col);
 void scroll_screen();
 void set_color(char color);
+void print_char_at(char c, char color, int row, int col);
+char get_char_at(int row, int col);
+void save_char_under_mouse();
+void restore_char_under_mouse();
 
 #endif // SCREEN_H

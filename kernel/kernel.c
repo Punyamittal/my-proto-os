@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "screen.h"
 #include "keyboard.h"
+#include "mouse.h"
 #include "network.h"
 #include "json.h"
 #include "langchain.h"
@@ -48,6 +49,9 @@ void init_kernel() {
     // Initialize keyboard
     init_keyboard();
     
+    // Initialize mouse
+    init_mouse();
+    
     // Initialize network (simulated)
     init_network();
     
@@ -65,6 +69,7 @@ void init_kernel() {
     print_string("Welcome to your voice-controlled AI operating system!\n", VGA_LIGHT_CYAN);
     print_string("Default AI Model: Google Gemini\n", VGA_LIGHT_YELLOW);
     print_string("Voice Assistant: Always-on, ready for 'Hey Proto' commands\n", VGA_LIGHT_YELLOW);
+    print_string("Mouse Support: PS/2 mouse driver initialized\n", VGA_LIGHT_BLUE);
     print_string("==========================================\n", VGA_LIGHT_GREY);
 }
 

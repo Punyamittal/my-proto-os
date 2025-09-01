@@ -31,3 +31,4 @@ int http_post(const char* url, const char* data, char* response, int max_respons
 int parse_url(const char* url, char* host, char* path, int* port);
 
 #endif // NETWORK_H
+

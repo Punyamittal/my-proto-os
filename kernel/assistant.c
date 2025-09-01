@@ -363,3 +363,5 @@ int get_current_date(char* date_str, int max_length) {
     
     return 1;
 }
+
+

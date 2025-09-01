@@ -28,6 +28,7 @@ int cmd_ai(int argc, char* argv[]);
 int cmd_model(int argc, char* argv[]);
 int cmd_history(int argc, char* argv[]);
 int cmd_reset(int argc, char* argv[]);
+int cmd_mouse(int argc, char* argv[]);
 int cmd_exit(int argc, char* argv[]);
 
 // AI-specific commands
@@ -37,3 +38,4 @@ int cmd_set_model(int argc, char* argv[]);
 int cmd_clear_history(int argc, char* argv[]);
 
 #endif // SHELL_H
+

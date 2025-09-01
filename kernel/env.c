@@ -108,3 +108,5 @@ void print_environment() {
         print_string("\n", VGA_LIGHT_GREY);
     }
 }
+
+

@@ -82,3 +82,5 @@ int get_current_time(char* time_str, int max_length);
 int get_current_date(char* date_str, int max_length);
 
 #endif // ASSISTANT_H
+
+

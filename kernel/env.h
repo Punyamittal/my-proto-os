@@ -24,3 +24,5 @@ int set_env_var(const char* key, const char* value);
 #define ENV_ANTHROPIC_API_KEY "ANTHROPIC_API_KEY"
 
 #endif // ENV_H
+
+

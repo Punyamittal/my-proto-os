@@ -340,3 +340,4 @@ int json_get_array_length(const char* json_string, const char* key) {
     // In a real implementation, you'd parse the array structure
     return 0;
 }
+

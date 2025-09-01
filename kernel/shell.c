@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "screen.h"
 #include "keyboard.h"
+#include "mouse.h"
 #include "langchain.h"
 #include "env.h"
 #include "voice.h"
@@ -30,6 +31,7 @@ static shell_command_t builtin_commands[] = {
     {"news", "Get latest news", cmd_news},
     {"history", "Show command history", cmd_history},
     {"reset", "Reset AI conversation", cmd_reset},
+    {"mouse", "Mouse control commands", cmd_mouse},
     {"exit", "Exit the shell", cmd_exit},
     {"", "", NULL} // End marker
 };
@@ -166,6 +168,9 @@ void run_shell() {
             // Poll for keyboard input
             poll_keyboard();
             
+            // Poll for mouse input
+            poll_mouse();
+            
             if (key_available()) {
                 char key = get_char();
                 
@@ -182,6 +187,15 @@ void run_shell() {
                     command_buffer[buffer_pos++] = key;
                     print_char(key, VGA_LIGHT_WHITE);
                 }
+            }
+            
+            // Check for mouse clicks
+            if (is_mouse_button_pressed(0)) { // Left click
+                // Move cursor to mouse position
+                int mouse_x, mouse_y;
+                get_mouse_position(&mouse_x, &mouse_y);
+                set_cursor(mouse_y, mouse_x);
+                // Could add click-to-position functionality here
             }
             
             // Small delay to prevent excessive CPU usage
@@ -230,6 +244,12 @@ int cmd_help(int argc, char* argv[]) {
     print_string("\nEnvironment:\n", VGA_LIGHT_GREEN);
     print_string("  env - Show environment variables\n", VGA_LIGHT_WHITE);
     print_string("  API keys are automatically loaded from .env file\n", VGA_LIGHT_WHITE);
+    
+    print_string("\nMouse Commands:\n", VGA_LIGHT_GREEN);
+    print_string("  mouse status - Show mouse status\n", VGA_LIGHT_WHITE);
+    print_string("  mouse show - Show mouse cursor\n", VGA_LIGHT_WHITE);
+    print_string("  mouse hide - Hide mouse cursor\n", VGA_LIGHT_WHITE);
+    print_string("  mouse pos - Show mouse position\n", VGA_LIGHT_WHITE);
     
     return 0;
 }
@@ -527,6 +547,73 @@ int cmd_history(int argc, char* argv[]) {
 int cmd_reset(int argc, char* argv[]) {
     langchain_clear_history(&ai_session);
     print_string("AI conversation history cleared\n", VGA_LIGHT_GREEN);
+    return 0;
+}
+
+int cmd_mouse(int argc, char* argv[]) {
+    if (argc < 2) {
+        print_string("Mouse Commands:\n", VGA_LIGHT_CYAN);
+        print_string("  mouse status - Show mouse status\n", VGA_LIGHT_WHITE);
+        print_string("  mouse show - Show mouse cursor\n", VGA_LIGHT_WHITE);
+        print_string("  mouse hide - Hide mouse cursor\n", VGA_LIGHT_WHITE);
+        print_string("  mouse pos - Show mouse position\n", VGA_LIGHT_WHITE);
+        return 0;
+    }
+    
+    if (strcmp(argv[1], "status") == 0) {
+        print_string("Mouse Status:\n", VGA_LIGHT_CYAN);
+        print_string("  Driver: PS/2 Mouse Driver\n", VGA_LIGHT_WHITE);
+        print_string("  Visible: ", VGA_LIGHT_WHITE);
+        print_string(mouse_state.visible ? "Yes" : "No", mouse_state.visible ? VGA_LIGHT_GREEN : VGA_LIGHT_RED);
+        print_string("\n  Left Button: ", VGA_LIGHT_WHITE);
+        print_string(mouse_state.left_button ? "Pressed" : "Released", mouse_state.left_button ? VGA_LIGHT_GREEN : VGA_LIGHT_GREY);
+        print_string("\n  Right Button: ", VGA_LIGHT_WHITE);
+        print_string(mouse_state.right_button ? "Pressed" : "Released", mouse_state.right_button ? VGA_LIGHT_GREEN : VGA_LIGHT_GREY);
+        print_string("\n  Middle Button: ", VGA_LIGHT_WHITE);
+        print_string(mouse_state.middle_button ? "Pressed" : "Released", mouse_state.middle_button ? VGA_LIGHT_GREEN : VGA_LIGHT_GREY);
+        print_string("\n", VGA_LIGHT_WHITE);
+    } else if (strcmp(argv[1], "show") == 0) {
+        show_mouse_cursor();
+        print_string("Mouse cursor shown\n", VGA_LIGHT_GREEN);
+    } else if (strcmp(argv[1], "hide") == 0) {
+        hide_mouse_cursor();
+        print_string("Mouse cursor hidden\n", VGA_LIGHT_YELLOW);
+    } else if (strcmp(argv[1], "pos") == 0) {
+        int x, y;
+        get_mouse_position(&x, &y);
+        print_string("Mouse position: ", VGA_LIGHT_CYAN);
+        
+        char pos_str[32];
+        int temp = x;
+        int i = 0;
+        do {
+            pos_str[i++] = '0' + (temp % 10);
+            temp /= 10;
+        } while (temp > 0);
+        
+        while (i > 0) {
+            print_char(pos_str[--i], VGA_LIGHT_WHITE);
+        }
+        
+        print_string(", ", VGA_LIGHT_GREY);
+        
+        temp = y;
+        i = 0;
+        do {
+            pos_str[i++] = '0' + (temp % 10);
+            temp /= 10;
+        } while (temp > 0);
+        
+        while (i > 0) {
+            print_char(pos_str[--i], VGA_LIGHT_WHITE);
+        }
+        
+        print_string("\n", VGA_LIGHT_WHITE);
+    } else {
+        print_string("Unknown mouse command. Use: status, show, hide, pos\n", VGA_LIGHT_RED);
+        return 1;
+    }
+    
     return 0;
 }
 

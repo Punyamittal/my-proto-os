@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "mouse.h"
 
 // VGA text mode buffer
 volatile unsigned short* vga_buffer = (unsigned short*)VGA_BUFFER;
@@ -104,4 +105,41 @@ void scroll_screen() {
 // Set the current color
 void set_color(char color) {
     current_color = color;
+}
+
+// Print a character at specific position (for mouse cursor)
+void print_char_at(char c, char color, int row, int col) {
+    if (row >= 0 && row < VGA_HEIGHT && col >= 0 && col < VGA_WIDTH) {
+        vga_buffer[row * VGA_WIDTH + col] = make_vga_entry(c, color);
+    }
+}
+
+// Get character at specific position
+char get_char_at(int row, int col) {
+    if (row >= 0 && row < VGA_HEIGHT && col >= 0 && col < VGA_WIDTH) {
+        return (char)(vga_buffer[row * VGA_WIDTH + col] & 0xFF);
+    }
+    return ' ';
+}
+
+// Save character under mouse cursor
+char saved_char_under_mouse = ' ';
+int saved_mouse_x = 0;
+int saved_mouse_y = 0;
+
+// Save character under mouse cursor position
+void save_char_under_mouse() {
+    if (mouse_state.visible) {
+        saved_char_under_mouse = get_char_at(mouse_state.y, mouse_state.x);
+        saved_mouse_x = mouse_state.x;
+        saved_mouse_y = mouse_state.y;
+    }
+}
+
+// Restore character under mouse cursor
+void restore_char_under_mouse() {
+    if (saved_mouse_x >= 0 && saved_mouse_x < VGA_WIDTH && 
+        saved_mouse_y >= 0 && saved_mouse_y < VGA_HEIGHT) {
+        print_char_at(saved_char_under_mouse, current_color, saved_mouse_y, saved_mouse_x);
+    }
 }
