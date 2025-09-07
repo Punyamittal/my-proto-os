@@ -13,9 +13,7 @@
 // VGA text mode buffer starts at 0xB8000
 volatile unsigned short* vga_buffer = (volatile unsigned short*)0xB8000;
 
-// VGA text mode screen dimensions
-const int VGA_WIDTH = 80;
-const int VGA_HEIGHT = 25;
+// VGA text mode screen dimensions are defined in screen.h
 
 // Current cursor position
 int cursor_row = 0;
@@ -33,10 +31,10 @@ void print_char(char c, char color) {
     }
 }
 
-// Function to print a null-terminated string
-void print_string(const char* str) {
+// Function to print a null-terminated string with color
+void print_string(const char* str, char color) {
     while (*str != '\0') {
-        print_char(*str, 0x07); // light gray on black
+        print_char(*str, color);
         str++;
     }
 }

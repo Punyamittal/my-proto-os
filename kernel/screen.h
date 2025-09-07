@@ -22,7 +22,9 @@
 #define VGA_LIGHT_RED 0x0C
 #define VGA_LIGHT_MAGENTA 0x0D
 #define VGA_LIGHT_BROWN 0x0E
+#define VGA_LIGHT_YELLOW 0x0E  // Same as LIGHT_BROWN in VGA
 #define VGA_WHITE 0x0F
+#define VGA_LIGHT_GREY 0x07    // Same as LIGHT_GREY
 
 // Function declarations
 void init_screen();
