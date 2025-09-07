@@ -24,6 +24,7 @@
 #define VGA_LIGHT_BROWN 0x0E
 #define VGA_LIGHT_YELLOW 0x0E  // Same as LIGHT_BROWN in VGA
 #define VGA_WHITE 0x0F
+#define VGA_LIGHT_WHITE 0x0F   // Same as WHITE
 #define VGA_LIGHT_GREY 0x07    // Same as LIGHT_GREY
 
 // Function declarations

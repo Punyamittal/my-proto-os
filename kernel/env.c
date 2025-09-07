@@ -1,6 +1,60 @@
 #include "env.h"
 #include "screen.h"
-#include <string.h>
+
+// Define NULL for kernel environment
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+// Define size_t for kernel environment
+typedef unsigned int size_t;
+
+// String function implementations for kernel environment
+int strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(unsigned char*)s1 - *(unsigned char*)s2;
+}
+
+char* strcpy(char* dest, const char* src) {
+    char* d = dest;
+    while ((*d++ = *src++));
+    return dest;
+}
+
+size_t strlen(const char* s) {
+    size_t len = 0;
+    while (s[len]) len++;
+    return len;
+}
+
+char* strncpy(char* dest, const char* src, size_t n) {
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
+}
+
+char* strstr(const char* haystack, const char* needle) {
+    if (!*needle) return (char*)haystack;
+    
+    for (; *haystack; haystack++) {
+        const char* h = haystack;
+        const char* n = needle;
+        while (*h && *n && (*h == *n)) {
+            h++;
+            n++;
+        }
+        if (!*n) return (char*)haystack;
+    }
+    return NULL;
+}
 
 // Global environment storage
 static env_var_t env_vars[MAX_ENV_VARS];

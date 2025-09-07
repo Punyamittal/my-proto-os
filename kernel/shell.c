@@ -6,7 +6,85 @@
 #include "env.h"
 #include "voice.h"
 #include "assistant.h"
-#include <string.h>
+
+// Define NULL for kernel environment
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
+// Define size_t for kernel environment
+typedef unsigned int size_t;
+
+// Function declarations
+size_t strlen(const char* s);
+char* strncpy(char* dest, const char* src, size_t n);
+int strcmp(const char* s1, const char* s2);
+void* memset(void* s, int c, size_t n);
+
+// Command function declarations
+int cmd_env(int argc, char* argv[]);
+int cmd_voice(int argc, char* argv[]);
+int cmd_assistant(int argc, char* argv[]);
+int cmd_search(int argc, char* argv[]);
+int cmd_weather(int argc, char* argv[]);
+int cmd_news(int argc, char* argv[]);
+void print_environment();
+
+// String function implementations for kernel environment
+char* strcpy(char* dest, const char* src) {
+    char* d = dest;
+    while ((*d++ = *src++));
+    return dest;
+}
+
+char* strcat(char* dest, const char* src) {
+    char* d = dest;
+    while (*d) d++;
+    while ((*d++ = *src++));
+    return dest;
+}
+
+int snprintf(char* str, size_t size, const char* format, ...) {
+    if (size == 0) return 0;
+    size_t len = strlen(format);
+    if (len >= size) len = size - 1;
+    strncpy(str, format, len);
+    str[len] = '\0';
+    return len;
+}
+
+size_t strlen(const char* s) {
+    size_t len = 0;
+    while (s[len]) len++;
+    return len;
+}
+
+char* strncpy(char* dest, const char* src, size_t n) {
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
+}
+
+int strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(unsigned char*)s1 - *(unsigned char*)s2;
+}
+
+void* memset(void* s, int c, size_t n) {
+    unsigned char* p = (unsigned char*)s;
+    for (size_t i = 0; i < n; i++) {
+        p[i] = (unsigned char)c;
+    }
+    return s;
+}
 
 // Global shell state
 static char command_history[MAX_HISTORY][MAX_COMMAND_LENGTH];
